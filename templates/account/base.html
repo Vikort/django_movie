@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="ru">
+<html>
 <head>
     <!-- //Meta tag Keywords -->
-    <title>{% block title %} {% endblock title %}</title>
+    <title>{% block head_title %} {% endblock head_title %}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- //Meta tag Keywords -->
@@ -33,8 +33,36 @@
         </li>
         <li class="breadcrumb-item active editContent">Single Page</li>
     </ol>
-    {% block content %}
-    {% endblock content %}
+    {% block body %}
+
+        {% if messages %}
+            <div>
+                <strong>Messages:</strong>
+                <ul>
+                    {% for message in messages %}
+                        <li>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div>
+            <strong>Menu:</strong>
+            <ul>
+                {% if user.is_authenticated %}
+                    <li><a href="{% url 'account_email' %}">Change E-mail</a></li>
+                    <li><a href="{% url 'account_logout' %}">Sign Out</a></li>
+                {% else %}
+                    <li><a href="{% url 'account_login' %}">Sign In</a></li>
+                    <li><a href="{% url 'account_signup' %}">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </div>
+        {% block content %}
+        {% endblock %}
+    {% endblock %}
+    {% block extra_body %}
+    {% endblock %}
     {% include 'include/footer.html' %}
 </div>
 </body>
