@@ -37,7 +37,7 @@
                         <span>
                             <b>Актеры:</b>
                             {% for actor in movie.actors.all %}
-                                 <a href="{{ actor.get_absolute_url }}">{{ actor.name }}</a>
+                                <a href="{{ actor.get_absolute_url }}">{{ actor.name }}</a>
                             {% endfor %}
                         </span>
                     </li>
@@ -58,14 +58,18 @@
                     <li><span><b>Сборы в мире:</b>${{ movie.fess_in_world }}</span>
                     </li>
                     <li>
-                        <a href="#"><b>Рейтинг:</b>
-                            <span class="fa fa-star" aria-hidden="true"></span>
-                            <span class="fa fa-star" aria-hidden="true"></span>
-                            <span class="fa fa-star" aria-hidden="true"></span>
-                            <span class="fa fa-star" aria-hidden="true"></span>
-                            <span class="fa fa-star" aria-hidden="true"></span>
-                            <span class="editContent">5.0</span>
-                        </a>
+                        <form action="{% url 'add_rating' %}" method="post" name="rating">
+                            {% csrf_token %}
+                            <b>Рейтинг:</b>
+                            <input type="hidden" value="{{ movie.id }}" name="movie">
+                            <span class="rating" aria-hidden="true">
+                                {% for k,v in star_form.fields.star.choices %}
+                                    <input id="rating{{ v }}" type="radio" name="star" value="{{ v }}">
+                                    <label for="rating{{ v }}">{{ k }}</label>
+                                {% endfor %}
+                            </span>
+                            <span class="editContent">4.0</span>
+                        </form>
                     </li>
                     <div class="share-desc">
                         <div class="share">
@@ -74,17 +78,17 @@
                             <ul class="w3layouts_social_list list-unstyled">
                                 <li>
                                     <a href="#" class="w3pvt_facebook editContent">
-                                                <span class="fa fa-facebook-f"></span>
+                                        <span class="fa fa-facebook-f"></span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" class="w3pvt_twitter editContent">
-                                                <span class="fa fa-twitter"></span>
+                                        <span class="fa fa-twitter"></span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="#" class="w3pvt_dribble editContent">
-                                                <span class="fa fa-dribbble"></span>
+                                        <span class="fa fa-dribbble"></span>
                                     </a>
                                 </li>
                             </ul>
@@ -120,7 +124,7 @@
                 <!-- contact form grid -->
                 <div class="contact-single">
                     <h3 class="editContent">
-                                    <span class="sub-tittle editContent">{{ movie.reviews_set.count }}</span>Оставить
+                        <span class="sub-tittle editContent">{{ movie.reviews_set.count }}</span>Оставить
                         отзыв</h3>
                     <form action="{% url 'add_review' movie.id %}" method="post" class="mt-4" id="formReview">
                         {% csrf_token %}
@@ -194,5 +198,18 @@
             document.getElementById('contactparent').value = id;
             document.getElementById('contactcomment').innerText = `${name}, `;
         }
+
+        const rating = document.querySelector('form[name=rating]');
+
+        rating.addEventListener("change", function (e) {
+            // Получаем данные из формы
+            let data = new FormData(this);
+            fetch(`${this.action}`, {
+                method: 'POST',
+                body: data
+            })
+                .then(response => console.log("Рейтинг установлен"))
+                .catch(error => console.log("Ошибка"))
+        });
     </script>
 {% endblock movie %}
