@@ -4,6 +4,8 @@ from django.db import models
 
 
 # Create your models here.
+from django.urls import reverse
+
 
 class Category(models.Model):
     name = models.CharField(verbose_name='Категория', max_length=150)
@@ -67,6 +69,9 @@ class Movie(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_path(self):
+        return reverse('movie_detail', kwargs={'slug': self.url})
 
     class Meta:
         verbose_name = 'Фильм'
